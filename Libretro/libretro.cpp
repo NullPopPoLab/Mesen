@@ -20,6 +20,8 @@
 #include "../Utilities/FolderUtilities.h"
 #include "../Utilities/HexUtilities.h"
 
+#define CUSTOM_VERSION "+NC41"
+
 #define DEVICE_AUTO               RETRO_DEVICE_JOYPAD
 #define DEVICE_GAMEPAD            RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 0)
 #define DEVICE_POWERPAD           RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 1)
@@ -1182,10 +1184,14 @@ extern "C" {
 
 	RETRO_API void retro_get_system_info(struct retro_system_info *info)
 	{
+		static char buf[256];
+
 		_mesenVersion = EmulationSettings::GetMesenVersionString();
+		strncpy(buf,(_mesenVersion + CUSTOM_VERSION).c_str(),sizeof(buf));
+		buf[sizeof(buf)-1]=0;
 
 		info->library_name = "Mesen";
-		info->library_version = _mesenVersion.c_str();
+		info->library_version = buf;
 		// need_fullpath is required since HdPacks are
 		// identified via the rom file name
 		info->need_fullpath = true;

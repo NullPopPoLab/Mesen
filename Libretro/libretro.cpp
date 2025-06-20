@@ -50,6 +50,8 @@ static string _mesenVersion = "";
 static int32_t _saveStateSize = -1;
 static bool _shiftButtonsClockwise = false;
 static int32_t _audioSampleRate = 48000;
+static int fds_selected=0;
+static int fds_inserted=-1;
 
 //Include game database as a byte array (representing the MesenDB.txt file)
 #include "MesenDB.inc"
@@ -94,6 +96,80 @@ uint32_t pvmStylePalette[0x40] { 0xFF696964, 0xFF001774, 0xFF28007D, 0xFF3E006D,
 uint32_t sonyCxa2025AsPalette[0x40] { 0xFF585858, 0xFF00238C, 0xFF00139B, 0xFF2D0585, 0xFF5D0052, 0xFF7A0017, 0xFF7A0800, 0xFF5F1800, 0xFF352A00, 0xFF093900, 0xFF003F00, 0xFF003C22, 0xFF00325D, 0xFF000000, 0xFF000000, 0xFF000000, 0xFFA1A1A1, 0xFF0053EE, 0xFF153CFE, 0xFF6028E4, 0xFFA91D98, 0xFFD41E41, 0xFFD22C00, 0xFFAA4400, 0xFF6C5E00, 0xFF2D7300, 0xFF007D06, 0xFF007852, 0xFF0069A9, 0xFF000000, 0xFF000000, 0xFF000000, 0xFFFFFFFF, 0xFF1FA5FE, 0xFF5E89FE, 0xFFB572FE, 0xFFFE65F6, 0xFFFE6790, 0xFFFE773C, 0xFFFE9308, 0xFFC4B200, 0xFF79CA10, 0xFF3AD54A, 0xFF11D1A4, 0xFF06BFFE, 0xFF424242, 0xFF000000, 0xFF000000, 0xFFFFFFFF, 0xFFA0D9FE, 0xFFBDCCFE, 0xFFE1C2FE, 0xFFFEBCFB, 0xFFFEBDD0, 0xFFFEC5A9, 0xFFFED18E, 0xFFE9DE86, 0xFFC7E992, 0xFFA8EEB0, 0xFF95ECD9, 0xFF91E4FE, 0xFFACACAC, 0xFF000000, 0xFF000000 };
 uint32_t wavebeamPalette[0x40] { 0xFF6B6B6B, 0xFF001B88, 0xFF21009A, 0xFF40008C, 0xFF600067, 0xFF64001E, 0xFF590800, 0xFF481600, 0xFF283600, 0xFF004500, 0xFF004908, 0xFF00421D, 0xFF003659, 0xFF000000, 0xFF000000, 0xFF000000, 0xFFB4B4B4, 0xFF1555D3, 0xFF4337EF, 0xFF7425DF, 0xFF9C19B9, 0xFFAC0F64, 0xFFAA2C00, 0xFF8A4B00, 0xFF666B00, 0xFF218300, 0xFF008A00, 0xFF008144, 0xFF007691, 0xFF000000, 0xFF000000, 0xFF000000, 0xFFFFFFFF, 0xFF63B2FF, 0xFF7C9CFF, 0xFFC07DFE, 0xFFE977FF, 0xFFF572CD, 0xFFF4886B, 0xFFDDA029, 0xFFBDBD0A, 0xFF89D20E, 0xFF5CDE3E, 0xFF4BD886, 0xFF4DCFD2, 0xFF525252, 0xFF000000, 0xFF000000, 0xFFFFFFFF, 0xFFBCDFFF, 0xFFD2D2FF, 0xFFE1C8FF, 0xFFEFC7FF, 0xFFFFC3E1, 0xFFFFCAC6, 0xFFF2DAAD, 0xFFEBE3A0, 0xFFD2EDA2, 0xFFBCF4B4, 0xFFB5F1CE, 0xFFB6ECF1, 0xFFBFBFBF, 0xFF000000, 0xFF000000 };
 
+static bool disk_set_eject_state( bool ejected )
+{
+	std::shared_ptr<FdsSystemActionManager> fdsSam = _console->GetSystemActionManager<FdsSystemActionManager>();
+	if(!fdsSam)return false;
+
+	if(ejected){
+		fds_inserted=-1;
+		fdsSam->EjectDisk();
+	}
+	else{
+		fds_inserted=fds_selected;
+		fdsSam->InsertDisk(fds_selected);
+	}    
+	return true;
+}
+
+static bool disk_get_eject_state(void)
+{
+	return fds_inserted<0;
+}
+
+static bool disk_set_image_index(unsigned index)
+{
+	fds_selected=index;
+	return true;
+}
+
+unsigned disk_get_image_index(void)
+{
+	return fds_selected;
+}
+
+static unsigned disk_get_num_images(void)
+{
+	std::shared_ptr<FdsSystemActionManager> fdsSam = _console->GetSystemActionManager<FdsSystemActionManager>();
+	if(!fdsSam)return 0;
+
+	return fdsSam->GetSideCount();
+}
+
+static unsigned disk_get_num_drives(void)
+{
+	return 1;
+}
+
+static bool disk_get_image_label(unsigned index, char *label, size_t len)
+{
+	snprintf(label,len,"Disk %u Side %c",(index>>1)+1,(index&1)?'B':'A');
+	return true;
+}
+
+static int disk_get_drive_image_index(unsigned drive)
+{
+	return fds_inserted;
+}
+
+static struct retro_disk_control_ext2_callback disk_interface =
+{
+	disk_set_eject_state,
+	disk_get_eject_state,
+	disk_get_image_index,
+	disk_set_image_index,
+	disk_get_num_images,
+	0, /* disk_replace_image_index */
+	0, /* add_image_index */
+	0, /* set_initial_image */
+	0, /* get_image_path */
+	disk_get_image_label,
+	disk_get_num_drives,
+	0, /* set_drive_eject_state */
+	0, /* get_drive_eject_state */
+	disk_get_drive_image_index
+};
+
 extern "C" {
 	void logMessage(retro_log_level level, const char* message)
 	{
@@ -131,6 +207,8 @@ extern "C" {
 
 		if (env_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
 			_keyManager->SetSupportsInputBitmasks(true);
+
+		env_cb(RETRO_ENVIRONMENT_SET_DISK_CONTROL_EXT2_INTERFACE, &disk_interface);
 	}
 
 	RETRO_API void retro_deinit()
@@ -903,8 +981,6 @@ extern "C" {
 					}
 
 					if(port == 0) {
-						addDesc(port, RETRO_DEVICE_ID_JOYPAD_L, "(FDS) Insert Next Disk");
-						addDesc(port, RETRO_DEVICE_ID_JOYPAD_R, "(FDS) Switch Disk Side");
 						addDesc(port, RETRO_DEVICE_ID_JOYPAD_L2, "(VS) Insert Coin 1");
 						addDesc(port, RETRO_DEVICE_ID_JOYPAD_R2, "(VS) Insert Coin 2");
 						addDesc(port, RETRO_DEVICE_ID_JOYPAD_L3, "(Famicom) Microphone (P2)");
@@ -1162,6 +1238,14 @@ extern "C" {
 			//Round up to the next 1kb multiple
 			_saveStateSize = ((ss.str().size() * 2) + 0x400) & ~0x3FF;
 			retro_set_memory_maps();
+		}
+
+		std::shared_ptr<FdsSystemActionManager> fdsSam = _console->GetSystemActionManager<FdsSystemActionManager>();
+		if(fdsSam){
+			fds_inserted=0;
+		}
+		else{
+			fds_inserted=-1;
 		}
 
 		return result;

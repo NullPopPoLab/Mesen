@@ -92,15 +92,6 @@ public:
 			_mouseButtons[(int)MouseButton::RightButton] = _getInputState(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_RIGHT) != 0;
 			_mouseButtons[(int)MouseButton::MiddleButton] = _getInputState(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_MIDDLE) != 0;
 
-			std::shared_ptr<FdsSystemActionManager> fdsSam = _console->GetSystemActionManager<FdsSystemActionManager>();
-			if(fdsSam) {
-				if(ProcessAction(RETRO_DEVICE_ID_JOYPAD_L))
-					fdsSam->InsertNextDisk();
-				
-				if(ProcessAction(RETRO_DEVICE_ID_JOYPAD_R))
-					fdsSam->SwitchDiskSide();
-			}
-			
 			std::shared_ptr<VsSystemActionManager> vsSam = _console->GetSystemActionManager<VsSystemActionManager>();
 			if(vsSam) {
 				if(ProcessAction(RETRO_DEVICE_ID_JOYPAD_L2))

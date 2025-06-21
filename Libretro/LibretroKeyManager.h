@@ -11,7 +11,7 @@ class LibretroKeyManager : public IKeyManager
 private:
 	std::shared_ptr<Console> _console;
 	retro_input_state_t _getInputState = nullptr;
-	int16_t _joypadButtons[5] = { };
+	int32_t _joypadButtons[5] = { };
 	retro_input_poll_t _pollInput = nullptr;
 	bool _mouseButtons[3] = { false, false, false };
 	bool _supportsInputBitmasks = false;

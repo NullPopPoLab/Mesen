@@ -724,7 +724,7 @@ extern "C" {
 				keyMappings.Mapping1.ExcitingBoxingButtons[6] = getKeyCode(4, RETRO_DEVICE_ID_JOYPAD_X); //right jab
 				keyMappings.Mapping1.ExcitingBoxingButtons[7] = getKeyCode(4, RETRO_DEVICE_ID_JOYPAD_R); //straight
 			} else if(port == 1) {
-				keyMappings.Mapping1.Microphone = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_L3);
+				keyMappings.Mapping1.Microphone = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_L2);
 				keyMappings.Mapping1.PowerPadButtons[0] = getKeyCode(1, RETRO_DEVICE_ID_JOYPAD_B);
 				keyMappings.Mapping1.PowerPadButtons[1] = getKeyCode(1, RETRO_DEVICE_ID_JOYPAD_A);
 				keyMappings.Mapping1.PowerPadButtons[2] = getKeyCode(1, RETRO_DEVICE_ID_JOYPAD_Y);
@@ -987,9 +987,9 @@ extern "C" {
 					}
 
 					if(port == 0) {
-						addDesc(port, RETRO_DEVICE_ID_JOYPAD_L2, "(VS) Insert Coin 1");
-						addDesc(port, RETRO_DEVICE_ID_JOYPAD_R2, "(VS) Insert Coin 2");
-						addDesc(port, RETRO_DEVICE_ID_JOYPAD_L3, "(Famicom) Microphone (P2)");
+						addDesc(port, RETRO_DEVICE_ID_JOYPAD_L3, "(VS) Insert Coin 1");
+						addDesc(port, RETRO_DEVICE_ID_JOYPAD_R3, "(VS) Insert Coin 2");
+						addDesc(port, RETRO_DEVICE_ID_JOYPAD_L2, "(Famicom) Microphone");
 					}
 				}
 				addDesc(port, RETRO_DEVICE_ID_JOYPAD_START, "Start");

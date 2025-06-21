@@ -40,11 +40,21 @@ protected:
 			SetPressedState(Buttons::Left, keyMapping.Left);
 			SetPressedState(Buttons::Right, keyMapping.Right);
 
+			if(KeyManager::IsKeyPressed(keyMapping.AB)){
+				SetPressedState(Buttons::A, true);
+				SetPressedState(Buttons::B, true);
+			}
+
 			uint8_t turboFreq = 1 << (4 - _turboSpeed);
 			bool turboOn = (uint8_t)(_console->GetFrameCount() % turboFreq) < turboFreq / 2;
 			if(turboOn) {
 				SetPressedState(Buttons::A, keyMapping.TurboA);
 				SetPressedState(Buttons::B, keyMapping.TurboB);
+
+				if(KeyManager::IsKeyPressed(keyMapping.TurboAB)){
+					SetPressedState(Buttons::A, true);
+					SetPressedState(Buttons::B, true);
+				}
 			}
 
 			if(_microphoneEnabled && (_console->GetFrameCount() % 3) == 0) {

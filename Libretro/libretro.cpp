@@ -670,9 +670,11 @@ extern "C" {
 			} else {
 				keyMappings.Mapping1.A = getKeyCode(port, _shiftButtonsClockwise ? RETRO_DEVICE_ID_JOYPAD_B : RETRO_DEVICE_ID_JOYPAD_A);
 				keyMappings.Mapping1.B = getKeyCode(port, _shiftButtonsClockwise ? RETRO_DEVICE_ID_JOYPAD_Y : RETRO_DEVICE_ID_JOYPAD_B);
+				keyMappings.Mapping1.AB = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_C);
 				if(turboEnabled) {
 					keyMappings.Mapping1.TurboA = getKeyCode(port, _shiftButtonsClockwise ? RETRO_DEVICE_ID_JOYPAD_A : RETRO_DEVICE_ID_JOYPAD_X);
 					keyMappings.Mapping1.TurboB = getKeyCode(port, _shiftButtonsClockwise ? RETRO_DEVICE_ID_JOYPAD_X : RETRO_DEVICE_ID_JOYPAD_Y);
+					keyMappings.Mapping1.TurboAB = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_Z);
 				}
 			}
 
@@ -971,13 +973,17 @@ extern "C" {
 					if(_shiftButtonsClockwise) {
 						addDesc(port, RETRO_DEVICE_ID_JOYPAD_B, "A");
 						addDesc(port, RETRO_DEVICE_ID_JOYPAD_Y, "B");
+						addDesc(port, RETRO_DEVICE_ID_JOYPAD_C, "A+B");
 						addDesc(port, RETRO_DEVICE_ID_JOYPAD_A, "Turbo A");
 						addDesc(port, RETRO_DEVICE_ID_JOYPAD_X, "Turbo B");
+						addDesc(port, RETRO_DEVICE_ID_JOYPAD_Z, "Turbo A+B");
 					} else {
 						addDesc(port, RETRO_DEVICE_ID_JOYPAD_A, "A");
 						addDesc(port, RETRO_DEVICE_ID_JOYPAD_B, "B");
+						addDesc(port, RETRO_DEVICE_ID_JOYPAD_C, "A+B");
 						addDesc(port, RETRO_DEVICE_ID_JOYPAD_X, "Turbo A");
 						addDesc(port, RETRO_DEVICE_ID_JOYPAD_Y, "Turbo B");
+						addDesc(port, RETRO_DEVICE_ID_JOYPAD_Z, "Turbo A+B");
 					}
 
 					if(port == 0) {

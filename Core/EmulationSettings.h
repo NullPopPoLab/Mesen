@@ -296,6 +296,7 @@ struct KeyMapping
 {
 	uint32_t A = 0;
 	uint32_t B = 0;
+	uint32_t AB = 0;
 	uint32_t Up = 0;
 	uint32_t Down = 0;
 	uint32_t Left = 0;
@@ -304,6 +305,7 @@ struct KeyMapping
 	uint32_t Select = 0;
 	uint32_t TurboA = 0;
 	uint32_t TurboB = 0;
+	uint32_t TurboAB = 0;
 	uint32_t TurboStart = 0;
 	uint32_t TurboSelect = 0;
 	uint32_t Microphone = 0;
@@ -322,7 +324,7 @@ struct KeyMapping
 
 	bool HasKeySet()
 	{
-		if(A || B || Up || Down || Left || Right || Start || Select || TurboA || TurboB || TurboStart || TurboSelect || Microphone || LButton || RButton) {
+		if(A || B || AB || Up || Down || Left || Right || Start || Select || TurboA || TurboB || TurboAB || TurboStart || TurboSelect || Microphone || LButton || RButton) {
 			return true;
 		}
 

@@ -42,6 +42,8 @@
 #define DEVICE_BATTLEBOX          RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_NONE, 1)
 #define DEVICE_FOURPLAYERADAPTER  RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_NONE, 2)
 
+#define DEVICE_GAMEPAD_DUAL       RETRO_DEVICE_SUBCLASS(RETRO_DEVICE_JOYPAD, 9)
+
 static retro_log_printf_t logCallback = nullptr;
 retro_environment_t env_cb = nullptr;
 static unsigned _inputDevices[5] = { DEVICE_AUTO, DEVICE_AUTO, DEVICE_AUTO, DEVICE_AUTO, DEVICE_AUTO };
@@ -263,6 +265,7 @@ extern "C" {
 			{ "SNES Controller", DEVICE_SNESGAMEPAD },
 			{ "SNES Mouse", DEVICE_SNESMOUSE },
 			{ "Virtual Boy Controller" ,DEVICE_VBGAMEPAD },
+			{ "Dual Controller" ,DEVICE_GAMEPAD_DUAL },
 			{ NULL, 0 },
 		};
 
@@ -308,8 +311,8 @@ extern "C" {
 		};
 		
 		static constexpr struct retro_controller_info ports[] = {
-			{ pads1, 7 },
-			{ pads2, 7 },
+			{ pads1, 9 },
+			{ pads2, 8 },
 			{ pads3, 2 },
 			{ pads4, 2 },
 			{ pads5, 13 },
@@ -660,31 +663,60 @@ extern "C" {
 		auto getKeyBindings = [=](int port) {
 			KeyMappingSet keyMappings;
 			keyMappings.TurboSpeed = turboSpeed;
-			if(_console->GetSettings()->GetControllerType(port) == ControllerType::SnesController) {
-				keyMappings.Mapping1.LButton = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_L);
-				keyMappings.Mapping1.RButton = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_R);
-				keyMappings.Mapping1.A = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_A);
-				keyMappings.Mapping1.B = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_B);
-				keyMappings.Mapping1.TurboA = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_X);
-				keyMappings.Mapping1.TurboB = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_Y);
-			} else {
-				keyMappings.Mapping1.A = getKeyCode(port, _shiftButtonsClockwise ? RETRO_DEVICE_ID_JOYPAD_B : RETRO_DEVICE_ID_JOYPAD_A);
-				keyMappings.Mapping1.B = getKeyCode(port, _shiftButtonsClockwise ? RETRO_DEVICE_ID_JOYPAD_Y : RETRO_DEVICE_ID_JOYPAD_B);
-				keyMappings.Mapping1.AB = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_C);
-				if(turboEnabled) {
-					keyMappings.Mapping1.TurboA = getKeyCode(port, _shiftButtonsClockwise ? RETRO_DEVICE_ID_JOYPAD_A : RETRO_DEVICE_ID_JOYPAD_X);
-					keyMappings.Mapping1.TurboB = getKeyCode(port, _shiftButtonsClockwise ? RETRO_DEVICE_ID_JOYPAD_X : RETRO_DEVICE_ID_JOYPAD_Y);
-					keyMappings.Mapping1.TurboAB = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_Z);
+
+			if(_console->GetSettings()->GetControllerType(port) == ControllerType::DualController){
+				if(port==0){
+					keyMappings.Mapping1.A = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_L0);
+					keyMappings.Mapping1.B = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_L);
+					keyMappings.Mapping1.TurboA = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_L4);
+					keyMappings.Mapping1.TurboB = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_L5);
+					keyMappings.Mapping1.Start = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_G1);
+					keyMappings.Mapping1.Select = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_SELECT);
+					keyMappings.Mapping1.Up = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_UP);
+					keyMappings.Mapping1.Down = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_DOWN);
+					keyMappings.Mapping1.Left = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_LEFT);
+					keyMappings.Mapping1.Right = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_RIGHT);
+				}
+				else{
+					keyMappings.Mapping1.A = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_R0);
+					keyMappings.Mapping1.B = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_R);
+					keyMappings.Mapping1.TurboA = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_R4);
+					keyMappings.Mapping1.TurboB = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_R5);
+					keyMappings.Mapping1.Start = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_G2);
+					keyMappings.Mapping1.Select = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_START);
+					keyMappings.Mapping1.Up = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_X);
+					keyMappings.Mapping1.Down = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_B);
+					keyMappings.Mapping1.Left = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_Y);
+					keyMappings.Mapping1.Right = getKeyCode(0, RETRO_DEVICE_ID_JOYPAD_A);
 				}
 			}
+			else{
+				if(_console->GetSettings()->GetControllerType(port) == ControllerType::SnesController) {
+					keyMappings.Mapping1.LButton = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_L);
+					keyMappings.Mapping1.RButton = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_R);
+					keyMappings.Mapping1.A = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_A);
+					keyMappings.Mapping1.B = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_B);
+					keyMappings.Mapping1.TurboA = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_X);
+					keyMappings.Mapping1.TurboB = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_Y);
+				} else {
+					keyMappings.Mapping1.A = getKeyCode(port, _shiftButtonsClockwise ? RETRO_DEVICE_ID_JOYPAD_B : RETRO_DEVICE_ID_JOYPAD_A);
+					keyMappings.Mapping1.B = getKeyCode(port, _shiftButtonsClockwise ? RETRO_DEVICE_ID_JOYPAD_Y : RETRO_DEVICE_ID_JOYPAD_B);
+					keyMappings.Mapping1.AB = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_C);
+					if(turboEnabled) {
+						keyMappings.Mapping1.TurboA = getKeyCode(port, _shiftButtonsClockwise ? RETRO_DEVICE_ID_JOYPAD_A : RETRO_DEVICE_ID_JOYPAD_X);
+						keyMappings.Mapping1.TurboB = getKeyCode(port, _shiftButtonsClockwise ? RETRO_DEVICE_ID_JOYPAD_X : RETRO_DEVICE_ID_JOYPAD_Y);
+						keyMappings.Mapping1.TurboAB = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_Z);
+					}
+				}
 
-			keyMappings.Mapping1.Start = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_START);
-			keyMappings.Mapping1.Select = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_SELECT);
+				keyMappings.Mapping1.Start = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_START);
+				keyMappings.Mapping1.Select = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_SELECT);
 
-			keyMappings.Mapping1.Up = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_UP);
-			keyMappings.Mapping1.Down = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_DOWN);
-			keyMappings.Mapping1.Left = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_LEFT);
-			keyMappings.Mapping1.Right = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_RIGHT);
+				keyMappings.Mapping1.Up = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_UP);
+				keyMappings.Mapping1.Down = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_DOWN);
+				keyMappings.Mapping1.Left = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_LEFT);
+				keyMappings.Mapping1.Right = getKeyCode(port, RETRO_DEVICE_ID_JOYPAD_RIGHT);
+			}
 
 			if(port == 0) {
 				keyMappings.Mapping1.PartyTapButtons[0] = getKeyCode(4, RETRO_DEVICE_ID_JOYPAD_B);
@@ -935,6 +967,7 @@ extern "C" {
 						case ControllerType::Zapper: device = DEVICE_ZAPPER; break;
 						case ControllerType::ArkanoidController: device = DEVICE_ARKANOID; break;
 						case ControllerType::VbController: device = DEVICE_VBGAMEPAD; break;
+						case ControllerType::DualController: device = DEVICE_GAMEPAD_DUAL; break;
 						default: return;
 					}
 				} else if(port == 4) {
@@ -957,7 +990,34 @@ extern "C" {
 				}
 			}
 
-			if(device == DEVICE_GAMEPAD || device == DEVICE_SNESGAMEPAD) {
+			if(device == DEVICE_GAMEPAD_DUAL) {
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_LEFT, "P1 D-Pad Left");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_UP, "P1 D-Pad Up");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_DOWN, "P1 D-Pad Down");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_RIGHT, "P1 D-Pad Right");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_L0, "P1 A");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_L, "P1 B");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_L4, "P1 Turbo A");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_L5, "P1 Turbo B");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_G1, "P1 Start");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_SELECT, "P1 Select");
+
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_Y, "P2 D-Pad Left");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_X, "P2 D-Pad Up");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_B, "P2 D-Pad Down");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_A, "P2 D-Pad Right");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_R0, "P2 A");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_R, "P2 B");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_R4, "P2 Turbo A");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_R5, "P2 Turbo B");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_G2, "P2 Start");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_START, "P2 Select");
+
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_L3, "(VS) Insert Coin 1");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_R3, "(VS) Insert Coin 2");
+				addDesc(port, RETRO_DEVICE_ID_JOYPAD_L2, "(Famicom) Microphone");
+			}
+			else if(device == DEVICE_GAMEPAD || device == DEVICE_SNESGAMEPAD) {
 				addDesc(port, RETRO_DEVICE_ID_JOYPAD_LEFT, "D-Pad Left");
 				addDesc(port, RETRO_DEVICE_ID_JOYPAD_UP, "D-Pad Up");
 				addDesc(port, RETRO_DEVICE_ID_JOYPAD_DOWN, "D-Pad Down");
@@ -1066,6 +1126,7 @@ extern "C" {
 			_console->GetSettings()->InitializeInputDevices(GameInputType::StandardControllers, GameSystem::NesNtsc, true);
 		}
 
+		bool dualpad=false;
 		for(int port = 0; port < 5; port++) {
 			if(_inputDevices[port] != DEVICE_AUTO) {
 				if(port <= 3) {
@@ -1079,7 +1140,9 @@ extern "C" {
 						case DEVICE_SNESGAMEPAD: type = ControllerType::SnesController; break;
 						case DEVICE_SNESMOUSE: type = ControllerType::SnesMouse; break;
 						case DEVICE_VBGAMEPAD: type = ControllerType::VbController; break;
+						case DEVICE_GAMEPAD_DUAL: type = ControllerType::DualController; dualpad=true; break;
 					}
+					if(port==1 && dualpad)type = ControllerType::DualController;
 					_console->GetSettings()->SetControllerType(port, type);
 				} else {
 					ExpansionPortDevice type = ExpansionPortDevice::None;

@@ -108,6 +108,7 @@ shared_ptr<BaseControlDevice> ControlManager::CreateControllerDevice(ControllerT
 		case ControllerType::SuborMouse: device.reset(new SuborMouse(console, port)); break;
 		case ControllerType::VsZapper: device.reset(new VsZapper(console, port)); break;
 		case ControllerType::VbController: device.reset(new VbController(console, port, console->GetSettings()->GetControllerKeys(port))); break;
+		case ControllerType::DualController: device.reset(new StandardController(console, 0, console->GetSettings()->GetControllerKeys(port))); break;
 	}
 	
 	return device;

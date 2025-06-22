@@ -260,6 +260,7 @@ enum class ControllerType
 	SuborMouse = 7,
 	VsZapper = 8,
 	VbController = 9,
+	DualController = 10,
 };
 
 extern const vector<string> ExpansionPortDeviceNames;

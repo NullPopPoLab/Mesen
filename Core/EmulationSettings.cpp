@@ -143,6 +143,7 @@ const vector<string> ControllerTypeNames = {
 	"SuborMouse",
 	"VsZapper",
 	"VbController",
+	"DualController",
 };
 
 const vector<string> ExpansionPortDeviceNames = {
